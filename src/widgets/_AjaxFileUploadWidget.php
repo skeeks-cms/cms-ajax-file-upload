@@ -10,12 +10,10 @@ namespace skeeks\cms\fileupload\widgets;
 use dosamigos\fileupload\FileUpload;
 use dosamigos\fileupload\FileUploadAsset;
 use dosamigos\fileupload\FileUploadPlusAsset;
-use skeeks\cms\fileupload\FileUploadModule;
 use skeeks\cms\models\CmsStorageFile;
 use yii\base\Widget;
 use yii\helpers\Html;
 use yii\helpers\Json;
-use yii\widgets\InputWidget;
 
 /**
  * @property CmsStorageFile $cmsFile
@@ -23,20 +21,15 @@ use yii\widgets\InputWidget;
  * Class AjaxFileUploadWidget
  * @package skeeks\cms\widgets\fileupload
  */
-class AjaxFileUploadWidget extends InputWidget
+class AjaxFileUploadWidget extends FileUpload
 {
-    public $view_file        = 'ajax-file-upload';
+    public $viewFile        = 'ajax-file-upload';
+    public $url             = '/site/upload';
 
+    public $plus            = true;
 
-    public $upload_url      = ['/fileupload/upload'];
-
-    public function init()
-    {
-        FileUploadModule::registerTranslations();
-
-        $this->options['id']        = $this->id . "-widget";
-        $this->clientOptions['id']  = $this->id . "-widget";
-    }
+    public $clientEvents    = [];
+    public $hiddenOptions   = [];
 
     /**
      * @inheritdoc

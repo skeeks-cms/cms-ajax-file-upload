@@ -1,0 +1,38 @@
+<?php
+/**
+ * @author Semenov Alexander <semenov@skeeks.com>
+ * @link https://skeeks.com/
+ * @copyright (c) 2010 SkeekS
+ * @date 27.04.2017
+ */
+namespace skeeks\cms\fileupload\widgets\assets;
+use dosamigos\fileupload\FileUpload;
+use dosamigos\fileupload\FileUploadAsset;
+use dosamigos\fileupload\FileUploadPlusAsset;
+use skeeks\cms\base\AssetBundle;
+use skeeks\cms\models\CmsStorageFile;
+use yii\base\Widget;
+use yii\helpers\Html;
+use yii\helpers\Json;
+
+/**
+ * Class AjaxFileUploadWidgetAsset
+ *
+ * @package skeeks\cms\fileupload\widgets\assets
+ */
+class AjaxFileUploadWidgetAsset extends AssetBundle
+{
+    public $sourcePath = '@skeeks/cms/fileupload/widgets/assets/src';
+
+    public $css = [
+        'css/ajax-file-upload.css'
+    ];
+
+    public $js = [
+        'js/ajax-file-upload.js',
+    ];
+
+    public $depends = [
+        'yii\web\YiiAsset',
+    ];
+}

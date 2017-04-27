@@ -27,8 +27,13 @@ class AjaxFileUploadWidget extends InputWidget
 {
     public $view_file        = 'ajax-file-upload';
 
-
     public $upload_url      = ['/fileupload/upload'];
+
+    public $multiple        = false;
+
+    public $sources         = [
+
+    ];
 
     public function init()
     {
@@ -36,6 +41,8 @@ class AjaxFileUploadWidget extends InputWidget
 
         $this->options['id']        = $this->id . "-widget";
         $this->clientOptions['id']  = $this->id . "-widget";
+
+        $this->options['multiple'] = $this->multiple;
     }
 
     /**
@@ -45,6 +52,8 @@ class AjaxFileUploadWidget extends InputWidget
     {
         $this->options['id'] = $this->id . "-file";
         $fileInput =  Html::fileInput('file', '', $this->options);
+
+
         $this->hiddenOptions['id'] = $this->id . "-hidden";
         $hiddenInput = $this->hasModel()
             ? Html::activeHiddenInput($this->model, $this->attribute, $this->hiddenOptions)
@@ -73,52 +82,7 @@ class AjaxFileUploadWidget extends InputWidget
             'hiddenId'       => $this->hiddenOptions['id'],
             'clientOptions' => $this->clientOptions
         ]);
-        $this->view->registerJs(<<<JS
-(function(sx, $, _)
-{
-    sx.classes.Uploader = sx.classes.Component.extend({
-        _init: function()
-        {},
-        _onDomReady: function()
-        {
-            var self = this;
-            this.jInput = $('#' + this.get('inputId'));
-            this.jInputHidden = $('#' + this.get('hiddenId'));
-            this.jWrapper = $('#' + this.get('id'));
-            this.jFiles = $('.sx-files', this.jWrapper);
-            this.jRemoveBtn = $('.sx-btn-remove-file', this.jWrapper);
 
-            jQuery(this.jInput).fileupload(this.get('clientOptions'));
-            jQuery(this.jInput).on('fileuploadadd', function(e, data) {
-                self.jFiles.empty().append('Подождите идет загрузка...');
-            });
-            jQuery(this.jRemoveBtn).on('click', function(e, data) {
-                self.jFiles.empty();
-                self.jInputHidden.val("");
-                self.jInputHidden.change();
-            });
-            jQuery(this.jInput).on('fileuploaddone', function(e, data) {
-                self.jFiles.empty().append();
-                var result = data.result.data;
-                $("<img>", {
-                    'src' : result.publicPath,
-                    'style' : 'max-width: 80px; max-height: 80px;'
-                }).appendTo(self.jFiles);
-                self.jInputHidden.val(result.rootPath);
-                self.jInputHidden.change();
-            });
-        }
-    });
-    new sx.classes.Uploader({$jsOptions});
-})(sx, sx.$, sx._);
-JS
-);
-        $js[] = "";
-        if (!empty($this->clientEvents)) {
-            foreach ($this->clientEvents as $event => $handler) {
-                $js[] = "jQuery('#$id').on('$event', $handler);";
-            }
-        }
         $view->registerJs(implode("\n", $js));
     }
 

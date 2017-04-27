@@ -4,9 +4,16 @@
 /* @var $this yii\web\View */
 $widget = $this->context;
 ?>
-<div class="sx-uploader-wrapper" id="<?= $widget->id; ?>">
+<div class="sx-ajax-file-uploader-wrapper" id="<?= $widget->id; ?>">
     <div class="row">
         <div class="col-sm-12">
+
+            <div class="sx-files" style="float: left; margin-left: 10px;">
+                <? if ($widget->cmsFile): ?>
+                    <img src="<?= $widget->cmsFile->src; ?>" style="max-width: 80px; max-height: 80px;"/>
+                <? endif; ?>
+                <a href="#" class="btn btn-xs btn-default sx-btn-remove-file" title="Удалить">x</a>
+            </div>
 
             <div class="btn-group">
               <button type="button" id="source-simpleUpload-w5" class="btn btn-default fileinput-button">
@@ -29,12 +36,7 @@ $widget = $this->context;
                 <?= $fileInput ?>
                 <?= $hiddenInput ?>
             </div>
-            <div class="sx-files" style="float: left; margin-left: 10px;">
-                <? if ($widget->cmsFile): ?>
-                    <img src="<?= $widget->cmsFile->src; ?>" style="max-width: 80px; max-height: 80px;"/>
-                <? endif; ?>
-                <a href="#" class="btn btn-xs btn-default sx-btn-remove-file" title="Удалить">x</a>
-            </div>
+
         </div>
     </div>
 </div>

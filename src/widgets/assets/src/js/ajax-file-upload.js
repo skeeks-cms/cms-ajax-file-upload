@@ -22,4 +22,18 @@
         {}
     });
 
+    sx.classes.fileupload.Source = sx.classes.Component.extend({
+
+        _init: function()
+        {
+
+        },
+
+        _onDomReady: function()
+        {},
+
+        _onWindowReady: function()
+        {}
+    });
+
 })(sx, sx.$, sx._);

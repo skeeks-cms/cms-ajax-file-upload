@@ -30,9 +30,12 @@ class AjaxFileUploadWidgetAsset extends AssetBundle
 
     public $js = [
         'js/ajax-file-upload.js',
+        'js/ajax-file-upload-tool.js',
+        'js/tools/tool-remote-upload.js',
     ];
 
     public $depends = [
         'yii\web\YiiAsset',
+        'skeeks\sx\assets\Core',
     ];
 }

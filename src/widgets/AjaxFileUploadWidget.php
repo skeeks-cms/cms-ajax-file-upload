@@ -11,7 +11,9 @@ use dosamigos\fileupload\FileUpload;
 use dosamigos\fileupload\FileUploadAsset;
 use dosamigos\fileupload\FileUploadPlusAsset;
 use skeeks\cms\fileupload\FileUploadModule;
+use skeeks\cms\fileupload\widgets\assets\AjaxFileUploadWidgetAsset;
 use skeeks\cms\models\CmsStorageFile;
+use yii\base\InvalidConfigException;
 use yii\base\Widget;
 use yii\helpers\Html;
 use yii\helpers\Json;
@@ -19,30 +21,67 @@ use yii\widgets\InputWidget;
 
 /**
  * @property CmsStorageFile $cmsFile
+ * @property AjaxFileUploadDefaultTool|AjaxFileUploadTool $defaultTool
  *
  * Class AjaxFileUploadWidget
  * @package skeeks\cms\widgets\fileupload
  */
 class AjaxFileUploadWidget extends InputWidget
 {
+    public static $autoIdPrefix = 'AjaxFileUploadWidget';
+
     public $view_file        = 'ajax-file-upload';
 
     public $upload_url      = ['/fileupload/upload'];
 
     public $multiple        = false;
 
-    public $sources         = [
+    /**
+     * @var AjaxFileUploadDefaultTool[]
+     */
+    public $tools         = [
 
+        'default' =>
+        [
+            'class' => AjaxFileUploadDefaultTool::class,
+            'name' => 'Загрузить',
+            'icon' => 'glyphicon glyphicon-download-alt',
+        ],
+
+        'remote' =>
+        [
+            'class' => AjaxFileUploadDefaultTool::class,
+            'name' => 'Загрузить по ссылке',
+            'icon' => 'glyphicon glyphicon-globe',
+        ]
     ];
+
+    public $clientOptions         = [];
 
     public function init()
     {
         FileUploadModule::registerTranslations();
 
-        $this->options['id']        = $this->id . "-widget";
-        $this->clientOptions['id']  = $this->id . "-widget";
+        //$this->options['id']        = $this->id . "-widget";
+        //$this->clientOptions['id']  = $this->id . "-widget";
 
         $this->options['multiple'] = $this->multiple;
+
+        $tools = [];
+
+        foreach ($this->tools as $id => $config)
+        {
+            $config['id'] = $id;
+            $config['ajaxFileUploadWidget'] = $this;
+            $tools[$id] = \Yii::createObject($config);
+        }
+
+        $this->tools = $tools;
+
+        if (!$this->tools)
+        {
+            throw new InvalidConfigException('Not configurated file upload tools');
+        }
     }
 
     /**
@@ -50,40 +89,13 @@ class AjaxFileUploadWidget extends InputWidget
      */
     public function run()
     {
-        $this->options['id'] = $this->id . "-file";
-        $fileInput =  Html::fileInput('file', '', $this->options);
+        $element = $this->hasModel()
+            ? Html::activeHiddenInput($this->model, $this->attribute, $this->options)
+            : Html::hiddenInput($this->name, $this->value, $this->options);
 
-
-        $this->hiddenOptions['id'] = $this->id . "-hidden";
-        $hiddenInput = $this->hasModel()
-            ? Html::activeHiddenInput($this->model, $this->attribute, $this->hiddenOptions)
-            : Html::hiddenInput($this->name, $this->value, $this->hiddenOptions);
-        echo $this->render($this->viewFile, [
-            'fileInput'         => $fileInput,
-            'hiddenInput'       => $hiddenInput
+        echo $this->render($this->view_file, [
+            'element'         => $element,
         ]);
-        $this->registerClientScript();
-    }
-    /**
-     * Registers required script for the plugin to work as jQuery File Uploader
-     */
-    public function registerClientScript()
-    {
-        $view = $this->getView();
-        if($this->plus) {
-            FileUploadPlusAsset::register($view);
-        } else {
-            FileUploadAsset::register($view);
-        }
-        $id = $this->options['id'];
-        $jsOptions = Json::encode([
-            'id'            => $this->id,
-            'inputId'       => $id,
-            'hiddenId'       => $this->hiddenOptions['id'],
-            'clientOptions' => $this->clientOptions
-        ]);
-
-        $view->registerJs(implode("\n", $js));
     }
 
     /**
@@ -97,5 +109,13 @@ class AjaxFileUploadWidget extends InputWidget
         }
 
         return null;
+    }
+
+    /**
+     * @return AjaxFileUploadDefaultTool
+     */
+    public function getDefaultTool()
+    {
+        return reset($this->tools);
     }
 }

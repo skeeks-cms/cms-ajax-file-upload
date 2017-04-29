@@ -57,7 +57,19 @@ use yii\widgets\InputWidget;
 class AjaxFileUploadDefaultTool extends AjaxFileUploadTool
 {
     public $options = [];
-    public $clientOptions = [];
+    public $clientOptions = [
+        'uploadfile' =>
+        [
+            'disableImageResize' => '/Android(?!.*Chrome)|Opera/.test(window.navigator && navigator.userAgent)',
+            'imageCrop' => true,
+
+            'previewMaxWidth' => 400,
+            'previewMaxHeight' => 300,
+            'previewCrop' => true,
+            'limitMultiFileUploads' => 1,
+            'limitConcurrentUploads' => 1,
+        ]
+    ];
 
     public function init()
     {

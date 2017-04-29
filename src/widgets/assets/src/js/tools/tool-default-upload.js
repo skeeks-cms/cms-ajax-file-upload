@@ -39,9 +39,19 @@
             });
 
             jQuery(this.JInput).on('fileuploadprocessalways', function(e, data) {
-                console.log("fileuploadprocessalways");
-                console.log(e);
-                console.log(data);
+                var FileObject = data.context;
+
+                var index = data.index,
+                file = data.files[index];
+
+                if (file.preview) {
+                    FileObject.JImgPrev.append(file.preview);
+                }
+
+                if (file.error) {
+
+                    FileObject.JResult.empty().append(file.error);
+                }
             });
 
             jQuery(this.JInput).on('fileuploadprogressall', function(e, data) {
@@ -51,9 +61,33 @@
             });
 
             jQuery(this.JInput).on('fileuploaddone', function(e, data) {
-                console.log("fileuploaddone");
-                console.log(e);
-                console.log(data);
+                console.log(data.result);
+                var FileObject = data.context;
+
+                if (data.result.success === true)
+                {
+                    FileObject.JResult.empty().append("ОК");
+                } else
+                {
+                    FileObject.JResult.empty().append("<span style='color: red;'>" + data.result.message + "</span>");
+                }
+
+                FileObject.JWrapper.removeClass('sx-file-process').addClass('sx-file-success');
+
+                $.each(data.result.files, function (index, file) {
+                    if (file.url) {
+                        var link = $('<a>')
+                            .attr('target', '_blank')
+                            .prop('href', file.url);
+                        $(data.context.children()[index])
+                            .wrap(link);
+                    } else if (file.error) {
+                        var error = $('<span class="text-danger"/>').text(file.error);
+                        $(data.context.children()[index])
+                            .append('<br>')
+                            .append(error);
+                    }
+                });
             });
 
             jQuery(this.JInput).on('fileuploadsubmit', function(e, data) {
@@ -63,9 +97,9 @@
             });
 
             jQuery(this.JInput).on('fileuploadsend', function(e, data) {
-                console.log("fileuploadsend");
-                console.log(e);
-                console.log(data);
+                var FileObject = data.context;
+                FileObject.JWrapper.removeClass('sx-file-not-uploaded').addClass('sx-file-process');
+                FileObject.JResult.empty().append("<img src='/img/loaders/default-124.svg' height='20'/>").append(" Загрузка...");
             });
 
             jQuery(this.JInput).on('fileuploadprocess', function(e, data) {
@@ -87,9 +121,15 @@
             });
 
             jQuery(this.JInput).on('fileuploadfail', function(e, data) {
-                console.log("fileuploadfail");
-                console.log(e);
-                console.log(data);
+                var FileObject = data.context;
+                FileObject.JResult.empty().append("Ошибка");
+
+                $.each(data.files, function (index) {
+                    var error = $('<span class="text-danger"/>').text('File upload failed.');
+                    $(data.context.children()[index])
+                        .append('<br>')
+                        .append(error);
+                });
             });
 
             jQuery(this.JInput).on('paste', function(e, data) {

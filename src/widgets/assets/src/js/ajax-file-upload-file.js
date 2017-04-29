@@ -33,14 +33,16 @@
         },
 
 
+        /**
+         * @returns {*|HTMLElement}
+         */
         render: function()
         {
-            console.log(this);
-            this.JWrapper = $('<div>', {'class': 'col-md-4 sx-file-not-uploaded'});
+            this.JWrapper = $('<div>', {'class': 'col-md-3 sx-file-not-uploaded'});
             this.JCaption = $('<div>', {'class': 'caption'});
             this.JThumbWrapper = $('<div>', {'class' : 'thumbnail sx-box-shadow sx-box-shadow-hover-color'});
             this.JImgPrev = $('<div>', {'class' : 'img-preview'});
-            this.JResult = $('<div>', {'class' : 'sx-result'}).append('Ожидание...');
+            this.JResult = $('<div>', {'class' : 'sx-result'}).append('В очереди на загрузку...');
 
             this.JCaption
                 .append($('<h4>', {'title' : this.get('fileinfo').name}).text(this.get('fileinfo').name))
@@ -49,6 +51,8 @@
 
             this.JWrapper.append(this.JThumbWrapper);
             this.JThumbWrapper.append(this.JImgPrev).append(this.JCaption);
+
+            return this.JWrapper;
         }
     });
 

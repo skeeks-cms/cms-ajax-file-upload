@@ -30,7 +30,7 @@ class AjaxFileUploadWidget extends InputWidget
 {
     public static $autoIdPrefix = 'AjaxFileUploadWidget';
 
-    public $view_file        = 'ajax-file-upload';
+    public $view_file        = 'default';
 
     public $upload_url      = ['/fileupload/upload'];
 
@@ -50,7 +50,7 @@ class AjaxFileUploadWidget extends InputWidget
 
         'remote' =>
         [
-            'class' => AjaxFileUploadDefaultTool::class,
+            'class' => AjaxFileUploadRemoteTool::class,
             'name' => 'Загрузить по ссылке',
             'icon' => 'glyphicon glyphicon-globe',
         ]
@@ -62,10 +62,8 @@ class AjaxFileUploadWidget extends InputWidget
     {
         FileUploadModule::registerTranslations();
 
-        //$this->options['id']        = $this->id . "-widget";
-        //$this->clientOptions['id']  = $this->id . "-widget";
-
         $this->options['multiple'] = $this->multiple;
+        $this->clientOptions['id'] = $this->id;
 
         $tools = [];
 

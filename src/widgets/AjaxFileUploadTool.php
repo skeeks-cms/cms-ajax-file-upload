@@ -22,6 +22,8 @@ use yii\helpers\Json;
 use yii\widgets\InputWidget;
 
 /**
+ * Инструмент загрузки
+ * 
  * Class AjaxFileUploadTool
  *
  * @package skeeks\cms\fileupload\widgets
@@ -41,6 +43,11 @@ abstract class AjaxFileUploadTool extends Widget
      */
     public $id = null;
 
+    /**
+     * @var null backend url
+     */
+    public $upload_url = null;
+
     public function init()
     {
         parent::init();
@@ -48,6 +55,11 @@ abstract class AjaxFileUploadTool extends Widget
         if (!$this->ajaxFileUploadWidget || !$this->ajaxFileUploadWidget instanceof AjaxFileUploadWidget)
         {
             throw new InvalidConfigException();
+        }
+        
+        if (!$this->upload_url)
+        {
+            $this->upload_url = $this->ajaxFileUploadWidget->upload_url;
         }
     }
 }

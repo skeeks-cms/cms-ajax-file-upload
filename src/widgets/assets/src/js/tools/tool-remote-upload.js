@@ -14,6 +14,7 @@
         run: function()
         {
             var self = this;
+            console.log(self);
             //По клику на кнопку, загрузить по http, рисуем textarea, предлагаем ввести пользователю ссылки на изображения, которые хотим скачать, резделив их через запятую или с новой строки.
             //По нажатию кнопки начало загрузки.
             sx.prompt("Введите URL файла начиная с http://", {
@@ -41,15 +42,15 @@
             _.each(this.httpLinks, function (link, key) {
                 //Кидаем событие, начало работы с файлом
                 self.triggerStartUploadFile({
-                    'name': link,      //ссылка к загрузке
-                    'additional': {}  //дополнительная информация
+                    'name': link,       //ссылка к загрузке
+                    'additional': {}    //дополнительная информация
                 });
 
                 var ajaxData = _.extend(self.getManager().getCommonData(), {
                     'link': link
                 });
 
-                var ajax = sx.ajax.preparePostQuery(self.get('url'), ajaxData);
+                var ajax = sx.ajax.preparePostQuery(self.get('upload_url'), ajaxData);
 
                 ajax.onComplete(function (e, data)
                 {

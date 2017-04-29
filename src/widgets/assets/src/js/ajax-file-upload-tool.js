@@ -13,6 +13,9 @@
      */
     sx.classes.fileupload.tools._Tool = sx.classes.Component.extend({
 
+        run: function()
+        {},
+
         /**
          * @param AjaxFileUpload
          * @param opts
@@ -23,14 +26,31 @@
 
             if (! (AjaxFileUpload instanceof sx.classes.fileupload.AjaxFileUpload))
             {
-                throw new Error('Не передан менеджер загрузки');
+                throw new Error('Upload manager not uploaded');
             }
 
             opts = opts || {};
-            opts['Uploader'] = AjaxFileUpload;
+            this.Uploader = AjaxFileUpload;
+            
+            AjaxFileUpload.Tools.push(this);
 
             this.applyParentMethod(sx.classes.Component, 'construct', [opts]);
         },
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
 
         _init: function()
         {

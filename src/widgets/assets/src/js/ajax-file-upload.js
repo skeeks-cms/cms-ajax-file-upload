@@ -8,16 +8,40 @@
 {
     sx.createNamespace('classes.fileupload', sx);
 
+    /**
+     * Виджет загурзки файлов
+     */
     sx.classes.fileupload.AjaxFileUpload = sx.classes.Component.extend({
 
         _init: function()
         {
-            var self = this;
+            var self    = this;
+            //Инструменты загрузки
+            this.Tools  = [];
+            this.Files  = [];
         },
 
         _onDomReady: function()
         {
-
+            var self = this;
+            
+            this.JFiles = $(".sx-files", this.getJWrapper());
+            this.JTools = $(".sx-tools", this.getJWrapper());
+            
+            //Запуск инструмента загрузки
+            this.JRunToolBtn = $(".sx-run-tool", this.getJWrapper());
+            this.JRunToolBtn.on('click', function()
+            {
+                var id = $(this).data('tool-id');
+                var Tool = self.getTool(id);
+                if (!Tool || !Tool instanceof sx.classes.fileupload.tools._Tool)
+                {
+                    throw new Error('Tool not found or bad: ' + id);
+                    return false;
+                }
+                Tool.run();
+                return false;
+            });
         },
 
         /**
@@ -25,15 +49,32 @@
          */
         getJWrapper: function()
         {
-            return this.get('tools');
+            return $("#" + this.get('id'));
         },
 
         /**
-         * @returns {*}
+         * @param id
+         * @returns {null}
          */
-        getTools: function()
+        getTool: function(id)
         {
-            return this.get('tools');
+            return _.find(this.Tools, function(Tool)
+            {
+                return Tool.get('id') == id;
+            });
+            
+            return null;
+        },
+
+        /**
+         * @param File
+         * @returns {sx.classes.fileupload.AjaxFileUpload}
+         */
+        addFile: function(File)
+        {
+            this.Files.push(File);
+            this.JFiles.append(File.render());
+            return this;
         }
     });
 

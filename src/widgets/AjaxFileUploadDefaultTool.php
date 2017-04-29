@@ -22,6 +22,34 @@ use yii\helpers\Url;
 use yii\widgets\InputWidget;
 
 /**
+ *
+ * 'options' => [
+        'accept' => 'image/*',
+        'multiple' => true
+    ],
+ *
+ *
+ *  'clientOptions' => [
+ *      'uploadfile' => [
+        //'maxFileSize' => 2000000,
+        //'minFileSize' => 500,
+        'acceptFileTypes' => new \yii\web\JsExpression('/(\.|\/)(gif|jpe?g|png)$/i'),
+        'disableImageResize' => '/Android(?!.*Chrome)|Opera/.test(window.navigator && navigator.userAgent)',
+        'imageMaxWidth' => 10000,
+        'imageMaxHeight' => 10000,
+        'loadImageMaxFileSize' => 100000000, // 100MB
+        'imageCrop' => true,
+
+        'previewMaxWidth' => 400,
+        'previewMaxHeight' => 300,
+        'previewCrop' => true,
+        'limitMultiFileUploads' => 1,
+        'limitConcurrentUploads' => 1,
+        'dropZone' => new \yii\web\JsExpression('$(\'body\')')
+        ],
+    ],
+ *
+ *
  * Class AjaxFileUploadDefaultTool
  *
  * @package skeeks\cms\fileupload\widgets
@@ -30,7 +58,6 @@ class AjaxFileUploadDefaultTool extends AjaxFileUploadTool
 {
     public $options = [];
     public $clientOptions = [];
-    public $url = null;
 
     public function init()
     {
@@ -38,11 +65,12 @@ class AjaxFileUploadDefaultTool extends AjaxFileUploadTool
 
         $this->id = $this->ajaxFileUploadWidget->id . "-" . $this->id;
 
-        $url = Url::to($this->url);
         $this->options['id'] = $this->id;
-        $this->options['data-url'] = $url;
+        $this->options['data-url'] = $this->upload_url;
+        $this->options['multiple'] = $this->ajaxFileUploadWidget->multiple;
 
         $this->clientOptions['id'] = $this->id;
+        $this->clientOptions['uploadfile']['dropZone'] = new \yii\web\JsExpression("$('#{$this->ajaxFileUploadWidget->id}')");
     }
 
     public function run()

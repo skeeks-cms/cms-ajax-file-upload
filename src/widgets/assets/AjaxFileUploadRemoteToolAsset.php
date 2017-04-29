@@ -16,27 +16,22 @@ use yii\helpers\Html;
 use yii\helpers\Json;
 
 /**
- * Class AjaxFileUploadWidgetAsset
- *
+ * Class AjaxFileUploadDefaultToolAsset
  * @package skeeks\cms\fileupload\widgets\assets
  */
-class AjaxFileUploadWidgetAsset extends AssetBundle
+class AjaxFileUploadRemoteToolAsset extends AssetBundle
 {
     public $sourcePath = '@skeeks/cms/fileupload/widgets/assets/src';
 
-    public $css = [
-        'css/ajax-file-upload.css'
-    ];
+    public $css = [];
 
     public $js = [
-        'js/ajax-file-upload.js',
-        'js/ajax-file-upload-tool.js',
-        'js/ajax-file-upload-file.js',
         'js/tools/tool-remote-upload.js',
     ];
 
     public $depends = [
         'yii\web\YiiAsset',
-        'skeeks\sx\assets\Core',
+        'dosamigos\fileupload\FileUploadPlusAsset',
+        'skeeks\cms\fileupload\widgets\assets\AjaxFileUploadWidgetAsset',
     ];
 }

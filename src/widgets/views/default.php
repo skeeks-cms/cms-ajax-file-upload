@@ -51,7 +51,7 @@ JS
 );
 ?>
 
-        <div <!--style="display: none;"-->>
+        <div style="display: none;">
             <? foreach ($widget->tools as $tool) : ?>
                   <?= $tool->run(); ?>
               <? endforeach; ?>

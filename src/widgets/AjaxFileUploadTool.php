@@ -26,7 +26,7 @@ use yii\widgets\InputWidget;
  *
  * @package skeeks\cms\fileupload\widgets
  */
-abstract class AjaxFileUploadTool extends Component
+abstract class AjaxFileUploadTool extends Widget
     implements IHasInfo
 {
     use THasInfo;

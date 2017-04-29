@@ -73,7 +73,8 @@ class AjaxFileUploadWidget extends InputWidget
         {
             $config['id'] = $id;
             $config['ajaxFileUploadWidget'] = $this;
-            $tools[$id] = \Yii::createObject($config);
+            $tool = \Yii::createObject($config);
+            $tools[$id] = $tool;
         }
 
         $this->tools = $tools;
@@ -82,6 +83,8 @@ class AjaxFileUploadWidget extends InputWidget
         {
             throw new InvalidConfigException('Not configurated file upload tools');
         }
+
+
     }
 
     /**

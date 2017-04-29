@@ -12,14 +12,29 @@
 
         _init: function()
         {
-
+            var self = this;
         },
 
         _onDomReady: function()
-        {},
+        {
 
-        _onWindowReady: function()
-        {}
+        },
+
+        /**
+         * @returns {*}
+         */
+        getJWrapper: function()
+        {
+            return this.get('tools');
+        },
+
+        /**
+         * @returns {*}
+         */
+        getTools: function()
+        {
+            return this.get('tools');
+        }
     });
 
 })(sx, sx.$, sx._);

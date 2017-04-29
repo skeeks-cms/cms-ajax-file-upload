@@ -28,7 +28,6 @@
 
             opts = opts || {};
             opts['Uploader'] = AjaxFileUpload;
-            opts['id']      = "sx-" + self.getRandStr();
 
             this.applyParentMethod(sx.classes.Component, 'construct', [opts]);
         },

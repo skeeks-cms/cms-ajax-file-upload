@@ -35,10 +35,9 @@ $widget = $this->context;
             </div>
         </div>
 
-        <?= $element ?>
-
-    </div>
-</div>
+        <div style="display: none;">
+            <?= $element ?>
+        </div>
 <?
 \skeeks\cms\fileupload\widgets\assets\AjaxFileUploadWidgetAsset::register($this);
 $js = \yii\helpers\Json::encode($widget->clientOptions);
@@ -46,8 +45,17 @@ $js = \yii\helpers\Json::encode($widget->clientOptions);
 $this->registerJs(<<<JS
 (function(sx, $, _)
 {
-    new sx.classes.fileupload.AjaxFileUpload({$js});
+    sx.{$widget->id} = new sx.classes.fileupload.AjaxFileUpload({$js});
 })(sx, sx.$, sx._);
 JS
 );
 ?>
+
+        <div <!--style="display: none;"-->>
+            <? foreach ($widget->tools as $tool) : ?>
+                  <?= $tool->run(); ?>
+              <? endforeach; ?>
+        </div>
+
+    </div>
+</div>

@@ -49,7 +49,7 @@ class UploadController extends Controller
      */
     public function actionUpload()
     {
-        sleep(5);
+        //sleep(5);
         $rr = new RequestResponse();
         try
         {

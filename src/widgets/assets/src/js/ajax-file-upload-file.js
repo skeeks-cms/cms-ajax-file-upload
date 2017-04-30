@@ -153,7 +153,7 @@
             this.JThumbWrapper  = $('<div>', {'class' : 'thumbnail'});
             this.JFilePrev       = $('<div>', {'class' : 'file-preview'});
             this.JControlls       = $('<div>', {'class' : 'sx-controlls'});
-            this.JResult        = $('<div>', {'class' : 'sx-result'}).append(this.getStateText());
+            this.JResult        = $('<div>', {'class' : 'sx-result'});
 
             this.JControllsRemove = $("<a>", {'class' : 'btn btn-xs sx-remove', 'title' : 'Удалить'}).append(
                 $('<i>', {'class' : 'glyphicon glyphicon-remove'})
@@ -180,8 +180,9 @@
                 this.JFilePrev.empty().append(this.getPreview());
             }
 
-            if (this.getState() == 'process')
+            if (this.getState() == 'process' || this.getState() == 'queue')
             {
+                this.JResult.append(this.getStateText())
                 /*this.Blocker.block();*/
             } else
             {
@@ -212,7 +213,7 @@
          */
         remove: function()
         {
-            this.JWrapper.hide().remove();
+            this.JWrapper.fadeOut('slow').remove();
             this.isRemoved = true;
 
             this.Uploader.removeFile(this.get('id'));

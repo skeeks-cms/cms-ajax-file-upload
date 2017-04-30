@@ -49,11 +49,12 @@ class UploadController extends Controller
      */
     public function actionUpload()
     {
-        //sleep(5);
+        sleep(5);
         $rr = new RequestResponse();
         try
         {
-            $imageFile = UploadedFile::getInstanceByName(\Yii::$app->request->post('formName'));
+            $file = UploadedFile::getInstanceByName(\Yii::$app->request->post('formName'));
+
             $uid = uniqid(time(), true);
             $directory = \Yii::getAlias($this->local_root_tmp_dir) . DIRECTORY_SEPARATOR . $uid . DIRECTORY_SEPARATOR;
             if (!is_dir($directory))
@@ -65,29 +66,31 @@ class UploadController extends Controller
             {
                 throw new Exception(\Yii::t('app', 'Could not create a directory for download'));
             }
-            if (!$imageFile)
+
+            if ($file)
             {
-                throw new Exception(\Yii::t('app', 'Image not found'));
+                $filePath = $directory . $file->name;
+                if (!$file->saveAs($filePath))
+                {
+                    throw new Exception(\Yii::t('app', 'Could not upload the image to a local folder'));
+                }
+                $path = $this->local_public_tmp_dir . '/' . $uid . "/" . $file->name;
+                $rr->success = true;
+                $rr->data = [
+                    'name'          =>  $file->name,
+                    'size'          =>  $file->size,
+                    "src"           =>  $path,
+                    "rootPath"      =>  $filePath,
+                ];
             }
-            $filePath = $directory . $imageFile->name;
-            if (!$imageFile->saveAs($filePath))
-            {
-                throw new Exception(\Yii::t('app', 'Could not upload the image to a local folder'));
-            }
-            $path = $this->local_public_tmp_dir . '/' . $uid . "/" . $imageFile->name;
-            $rr->success = true;
-            $rr->data = [
-                'name'          =>  $imageFile->name,
-                'size'          =>  $imageFile->size,
-                "publicPath"    =>  $path,
-                "rootPath"      =>  $filePath,
-            ];
+
         } catch (\Exception $e)
         {
             \Yii::error($e->getMessage(), 'uploader');
             $rr->message = $e->getMessage();
             $rr->success = false;
         }
+
         return $rr;
     }
 }

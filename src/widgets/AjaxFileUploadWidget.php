@@ -81,6 +81,26 @@ class AjaxFileUploadWidget extends InputWidget
 
         if ($this->multiple)
         {
+            if ($this->cmsFiles)
+            {
+                foreach ($this->cmsFiles as $file)
+                {
+                    $fileData = [
+                        'name' => $file->fileName,
+                        'value' => $file->id,
+                        'state' => 'success',
+                    ];
+
+                    if ($file->isImage())
+                    {
+                        $fileData['preview'] = Html::img($file->src);
+                    }
+
+                    $this->clientOptions['files'][] = $fileData;
+                }
+
+
+            }
 
         } else
         {
@@ -137,7 +157,7 @@ class AjaxFileUploadWidget extends InputWidget
             }
 
             $element = $this->hasModel()
-                ? Html::activeListBox($this->model, $this->attribute, $items)
+                ? Html::activeListBox($this->model, $this->attribute, $items, $this->options)
                 : Html::hiddenInput($this->name, $this->value, $this->options);
         } else
         {

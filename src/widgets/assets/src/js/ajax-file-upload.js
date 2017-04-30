@@ -143,6 +143,14 @@
 
             if (this.isMultiple())
             {
+                self.JElement.empty();
+
+                _.each(this.Files, function(File)
+                {
+                    self.JElement.append(
+                        $("<option>", {'value': File.getValue(), 'selected': 'selected'}).append(File.getValue())
+                    )
+                });
 
             } else
             {
@@ -152,11 +160,11 @@
                 {
                     self.JElement.val(File.getValue());
                 });
-
-                self.JElement.change();
-                this.trigger('change');
-                return this;
             }
+
+            self.JElement.change();
+            this.trigger('change');
+            return this;
         },
 
         /**

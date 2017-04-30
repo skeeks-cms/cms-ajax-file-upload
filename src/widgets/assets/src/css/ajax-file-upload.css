@@ -8,15 +8,52 @@
 
 }
 
+.sx-file
+{
+    text-align: center;
+}
+
+
+.sx-file .sx-controlls
+{
+    position: absolute;
+    display: none;
+}
+
+.sx-file:hover .sx-controlls
+{
+    display: block;
+}
+
+.sx-file .sx-remove:hover
+{
+    text-shadow: 2px 2px 12px red;
+    color: red;
+}
+
+.sx-file .thumbnail
+{
+    border-radius: 0px;
+    box-shadow: 1px 2px 3px rgba(0, 0, 0, 0.42);
+}
+
+
+
+.file-preview img
+{
+    max-width: 200px;
+    max-height: 200px;
+}
+
 .dropzone {
     /*background: palegreen;*/
 }
     .dropzone.in {
         font-size: larger;
-        background: silver;
+        background: rgba(192, 192, 192, 0.4);
     }
     .dropzone.hover {
-        background: lawngreen;
+        background: rgba(255, 203, 122, 0.44);
     }
     .dropzone.fade {
         -webkit-transition: all 0.3s ease-out;
@@ -33,9 +70,14 @@
     color: red;
 }
 
+.sx-state-process
+{
+    opacity: 0.5;
+}
+
 .sx-state-fail,
 .sx-state-queue
 {
-    opacity: 0.5;
+    opacity: 0.3;
 }
 

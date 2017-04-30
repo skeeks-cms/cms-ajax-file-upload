@@ -15,6 +15,7 @@ use skeeks\cms\fileupload\widgets\assets\AjaxFileUploadWidgetAsset;
 use skeeks\cms\models\CmsStorageFile;
 use yii\base\InvalidConfigException;
 use yii\base\Widget;
+use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\helpers\Json;
 use yii\widgets\InputWidget;
@@ -60,9 +61,15 @@ class AjaxFileUploadWidget extends InputWidget
 
     public function init()
     {
+        if (!$this->hasModel())
+        {
+            throw new InvalidConfigException('Invalid config');
+        }
+
         FileUploadModule::registerTranslations();
 
         $this->options['multiple'] = $this->multiple;
+        $this->clientOptions['multiple'] = $this->multiple;
         $this->clientOptions['id'] = $this->id;
 
         $this->clientOptions['fileStates'] = [
@@ -71,6 +78,28 @@ class AjaxFileUploadWidget extends InputWidget
             'fail' => \Yii::t('skeeks/cms-fileupload', 'Fail'),
             'success' => \Yii::t('skeeks/cms-fileupload', 'Success'),
         ];
+
+        if ($this->multiple)
+        {
+
+        } else
+        {
+            if ($this->cmsFile)
+            {
+                $fileData = [
+                    'name' => $this->cmsFile->fileName,
+                    'value' => $this->cmsFile->id,
+                    'state' => 'success',
+                ];
+                if ($this->cmsFile->isImage())
+                {
+                    $fileData['preview'] = Html::img($this->cmsFile->src);
+                }
+                $this->clientOptions['files'][] = $fileData;
+            }
+
+        }
+
 
         $tools = [];
 
@@ -97,9 +126,26 @@ class AjaxFileUploadWidget extends InputWidget
      */
     public function run()
     {
-        $element = $this->hasModel()
-            ? Html::activeHiddenInput($this->model, $this->attribute, $this->options)
-            : Html::hiddenInput($this->name, $this->value, $this->options);
+        Html::addCssClass($this->options, 'sx-element');
+
+        if ($this->multiple)
+        {
+            $items = [];
+            if ($this->model->{$this->attribute})
+            {
+                $items = ArrayHelper::map($this->getCmsFiles(), 'id', 'id');
+            }
+
+            $element = $this->hasModel()
+                ? Html::activeListBox($this->model, $this->attribute, $items)
+                : Html::hiddenInput($this->name, $this->value, $this->options);
+        } else
+        {
+            $element = $this->hasModel()
+                ? Html::activeHiddenInput($this->model, $this->attribute, $this->options)
+                : Html::hiddenInput($this->name, $this->value, $this->options);
+        }
+
 
         echo $this->render($this->view_file, [
             'element'         => $element,
@@ -114,6 +160,19 @@ class AjaxFileUploadWidget extends InputWidget
         if ($fileId = $this->model->{$this->attribute})
         {
             return CmsStorageFile::findOne((int) $fileId);
+        }
+
+        return null;
+    }
+
+    /**
+     * @return null|CmsStorageFile[]
+     */
+    public function getCmsFiles()
+    {
+        if ($fileId = $this->model->{$this->attribute})
+        {
+            return CmsStorageFile::find()->where(['id' => $fileId])->all();
         }
 
         return null;

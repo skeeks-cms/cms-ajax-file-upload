@@ -7,14 +7,9 @@ $widget = $this->context;
 <div class="sx-ajax-file-uploader-wrapper dropzone" id="<?= $widget->id; ?>">
     <div class="row">
 
-        <div class="col-sm-12 sx-files" style="float: left; margin-left: 10px;">
-            <div class="sx-file">
-                <? if ($widget->cmsFile): ?>
-                    <img src="<?= $widget->cmsFile->src; ?>" style="max-width: 80px; max-height: 80px;"/>
-                <? endif; ?>
-                <a href="#" class="btn btn-xs btn-default sx-btn-remove-file" title="Удалить">x</a>
-            </div>
+        <div class="sx-files">
         </div>
+
 
         <div class="col-sm-12 sx-tools">
             <div class="btn-group">

@@ -14,10 +14,9 @@
         run: function()
         {
             var self = this;
-            console.log(self);
             //По клику на кнопку, загрузить по http, рисуем textarea, предлагаем ввести пользователю ссылки на изображения, которые хотим скачать, резделив их через запятую или с новой строки.
             //По нажатию кнопки начало загрузки.
-            sx.prompt("Введите URL файла начиная с http://", {
+            sx.prompt("Введите URL файла", {
                 'yes': function (e, result)
                 {
                     self._processing(result);
@@ -31,40 +30,27 @@
             //1) считаем сколько всего пользователь указал ссылок (это делается на js)
             this.httpLinks = [link];
 
-            self.queue = _.size(this.httpLinks);   //В очереди к загрузки осталось столько то файлов
-            self.inProcess = true;                     //Загрузчик в работе
-
-            self.triggerStartUpload({
-                'queueLength': _.size(this.httpLinks) //сообщаем сколько файлов к загрузке всего
-            });
-
             //Берем каждую, и обрабатываем по очереди.
             _.each(this.httpLinks, function (link, key) {
                 //Кидаем событие, начало работы с файлом
-                self.triggerStartUploadFile({
-                    'name': link,       //ссылка к загрузке
-                    'additional': {}    //дополнительная информация
-                });
+                var FileObject = new sx.classes.fileupload.File(self.Uploader);
 
-                var ajaxData = _.extend(self.getManager().getCommonData(), {
+                FileObject.set('name', link);
+                FileObject.set('state', 'queue');
+                FileObject.set('state', 'process');
+
+                self.Uploader.appendFile(FileObject);
+
+                var ajax = sx.ajax.preparePostQuery(self.get('upload_url'), {
                     'link': link
                 });
 
-                var ajax = sx.ajax.preparePostQuery(self.get('upload_url'), ajaxData);
-
                 ajax.onComplete(function (e, data)
                 {
-                    self.triggerCompleteUploadFile({
+                    FileObject.set('state', 'success');
+                    /*self.triggerCompleteUploadFile({
                         'response': data.jqXHR.responseJSON
-                    });
-
-                    self.queue = self.queue - 1;
-
-                    if (self.queue == 0)
-                    {
-                        self.inProcess = false;
-                        self.triggerCompleteUpload({});
-                    }
+                    });*/
                 });
 
                 ajax.execute();

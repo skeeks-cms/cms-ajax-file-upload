@@ -22,6 +22,7 @@
             var self = this;
 
             this.isUploaded = false;
+            this.isRemoved  = false;
 
             if (! (AjaxFileUpload instanceof sx.classes.fileupload.AjaxFileUpload))
             {
@@ -34,6 +35,11 @@
             this.applyParentMethod(sx.classes.Component, 'construct', [opts]);
         },
 
+        _init: function()
+        {
+            this.JWrapper = null;
+            this.set('id', this._getRandStr());
+        },
 
         /**
          * @private
@@ -41,9 +47,6 @@
         _onDomReady: function()
         {
             var self = this;
-            this.JWrapper = $('<div>', {'class': 'col-md-3'});
-
-
         },
 
 
@@ -97,7 +100,44 @@
          */
         getValue: function()
         {
-            return String(this.get('value'));
+            return this.get('value');
+        },
+
+        /**
+         * @param value
+         * @returns {sx.classes.fileupload._File}
+         */
+        setValue: function(value)
+        {
+            this.set('value', value);
+            this.trigger('changeValue');
+            this.trigger('change');
+            return this;
+        },
+
+        /**
+         * @param callback
+         */
+        onValue: function(callback)
+        {
+            if (this.getValue())
+            {
+                callback();
+            } else
+            {
+                this.bind('changeValue', function()
+                {
+                    callback()
+                });
+            }
+        },
+
+        _initJWrapper: function()
+        {
+            if (this.JWrapper === null)
+            {
+                this.JWrapper = $('<div>', {'class': 'col-md-3 sx-file'});
+            }
         },
 
         /**
@@ -105,10 +145,24 @@
          */
         render: function()
         {
+            var self = this;
+
+            this._initJWrapper();
+
             this.JCaption       = $('<div>', {'class' : 'caption'});
             this.JThumbWrapper  = $('<div>', {'class' : 'thumbnail'});
             this.JFilePrev       = $('<div>', {'class' : 'file-preview'});
+            this.JControlls       = $('<div>', {'class' : 'sx-controlls'});
             this.JResult        = $('<div>', {'class' : 'sx-result'}).append(this.getStateText());
+
+            this.JControllsRemove = $("<a>", {'class' : 'btn btn-xs sx-remove', 'title' : 'Удалить'}).append(
+                $('<i>', {'class' : 'glyphicon glyphicon-remove'})
+            );
+
+            this.JControlls.append(
+                this.JControllsRemove
+            );
+
 
             this.JCaption
                 .append($('<h4>', {'title' : this.getName()}).text(this.getName()))
@@ -118,14 +172,20 @@
 
             if (this.getError())
             {
-                console.log('error');
-                console.log(this.getError());
                 this.JResult.empty().append(this.getError());
             }
 
             if (this.getPreview())
             {
                 this.JFilePrev.empty().append(this.getPreview());
+            }
+
+            if (this.getState() == 'process')
+            {
+                /*this.Blocker.block();*/
+            } else
+            {
+                /*this.Blocker.unblock();*/
             }
 
             this.JWrapper
@@ -135,9 +195,45 @@
                 .removeClass('sx-state-fail')
                 .addClass('sx-state-' + this.getState());
 
-            this.JWrapper.empty().append(this.JThumbWrapper);
+            this.JWrapper.empty().append(this.JControlls).append(this.JThumbWrapper);
+
+
+
+            this.JControllsRemove.on('click', function () {
+                self.remove()
+            });
+
+
             return this.JWrapper;
-        }
+        },
+
+        /**
+         * @returns {sx.classes.fileupload._File}
+         */
+        remove: function()
+        {
+            this.JWrapper.hide().remove();
+            this.isRemoved = true;
+
+            this.Uploader.removeFile(this.get('id'));
+            return this;
+        },
+
+
+        /**
+         * @returns {string}
+         */
+        _getRandStr: function()
+        {
+            var result       = '';
+            var words        = '0123456789qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM';
+            var max_position = words.length - 1;
+                for( i = 0; i < 6; ++i ) {
+                    position = Math.floor ( Math.random() * max_position );
+                    result = result + words.substring(position, position + 1);
+                }
+            return result;
+        },
     });
 
     sx.classes.fileupload.File = sx.classes.fileupload._File.extend();

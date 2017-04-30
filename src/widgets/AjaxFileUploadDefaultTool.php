@@ -16,6 +16,7 @@ use skeeks\cms\models\CmsStorageFile;
 use yii\base\Component;
 use yii\base\InvalidConfigException;
 use yii\base\Widget;
+use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\helpers\Json;
 use yii\helpers\Url;
@@ -57,7 +58,8 @@ use yii\widgets\InputWidget;
 class AjaxFileUploadDefaultTool extends AjaxFileUploadTool
 {
     public $options = [];
-    public $clientOptions = [
+    public $clientOptions = [];
+    public $defaultClientOptions = [
         'uploadfile' =>
         [
             'disableImageResize' => '/Android(?!.*Chrome)|Opera/.test(window.navigator && navigator.userAgent)',
@@ -79,14 +81,20 @@ class AjaxFileUploadDefaultTool extends AjaxFileUploadTool
     {
         parent::init();
 
-        $this->id = $this->ajaxFileUploadWidget->id . "-" . $this->id;
+        $this->id = $this->ajaxFileUploadWidget->id . "_" . $this->id;
 
         $this->options['id'] = $this->id;
         $this->options['data-url'] = $this->upload_url;
         $this->options['multiple'] = $this->ajaxFileUploadWidget->multiple;
 
+        $this->clientOptions = ArrayHelper::merge($this->defaultClientOptions, $this->clientOptions);
         $this->clientOptions['id'] = $this->id;
         $this->clientOptions['uploadfile']['dropZone'] = new \yii\web\JsExpression("$('#{$this->ajaxFileUploadWidget->id}')");
+
+        if (!$this->ajaxFileUploadWidget->multiple)
+        {
+            $this->clientOptions['uploadfile']['singleFileUploads'] = true;
+        }
     }
 
     public function run()

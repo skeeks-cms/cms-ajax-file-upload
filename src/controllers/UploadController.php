@@ -49,12 +49,13 @@ class UploadController extends Controller
      */
     public function actionUpload()
     {
-        sleep(5);
+        //sleep(5);
         $rr = new RequestResponse();
         try
         {
             $imageFile = UploadedFile::getInstanceByName(\Yii::$app->request->post('formName'));
-            $directory = \Yii::getAlias($this->local_root_tmp_dir) . DIRECTORY_SEPARATOR;
+            $uid = uniqid(time(), true);
+            $directory = \Yii::getAlias($this->local_root_tmp_dir) . DIRECTORY_SEPARATOR . $uid . DIRECTORY_SEPARATOR;
             if (!is_dir($directory))
             {
                 FileHelper::createDirectory($directory);
@@ -68,17 +69,15 @@ class UploadController extends Controller
             {
                 throw new Exception(\Yii::t('app', 'Image not found'));
             }
-            $uid = uniqid(time(), true);
-            $fileName = $uid . '.' . $imageFile->extension;
-            $filePath = $directory . $fileName;
+            $filePath = $directory . $imageFile->name;
             if (!$imageFile->saveAs($filePath))
             {
                 throw new Exception(\Yii::t('app', 'Could not upload the image to a local folder'));
             }
-            $path = $this->local_public_tmp_dir . '/' . $fileName;
+            $path = $this->local_public_tmp_dir . '/' . $uid . "/" . $imageFile->name;
             $rr->success = true;
             $rr->data = [
-                'name'          =>  $fileName,
+                'name'          =>  $imageFile->name,
                 'size'          =>  $imageFile->size,
                 "publicPath"    =>  $path,
                 "rootPath"      =>  $filePath,

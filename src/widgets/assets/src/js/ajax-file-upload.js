@@ -27,7 +27,8 @@
             
             this.JFiles = $(".sx-files", this.getJWrapper());
             this.JTools = $(".sx-tools", this.getJWrapper());
-            
+            this.JElement = $(".sx-element", this.getJWrapper());
+
             //Запуск инструмента загрузки
             this.JRunToolBtn = $(".sx-run-tool", this.getJWrapper());
             this.JRunToolBtn.on('click', function()
@@ -42,6 +43,16 @@
                 Tool.run();
                 return false;
             });
+
+            if (this.get('files'))
+            {
+                _.each(this.get('files'), function(filedata)
+                {
+                    var File = new sx.classes.fileupload.File(self, filedata);
+                    console.log(File);
+                    self.appendFile(File);
+                });
+            }
         },
 
         /**
@@ -75,15 +86,100 @@
         },
 
         /**
+         * @returns {boolean}
+         */
+        isMultiple: function()
+        {
+            return Boolean(this.get('multiple'));
+        },
+
+
+
+        /**
          * @param File
          * @returns {sx.classes.fileupload.AjaxFileUpload}
          */
-        addFile: function(File)
+        appendFile: function(NewFile)
         {
-            this.Files.push(File);
-            this.JFiles.append(File.render());
+            var self = this;
+
+            if (this.isMultiple())
+            {
+                this.Files.push(NewFile);
+                this.JFiles.append(NewFile.render());
+
+                NewFile.onValue(function()
+                {
+                    self.change();
+                });
+
+                return this;
+
+            } else
+            {
+                self.JElement.val('');
+                self.JElement.change();
+
+                _.each(this.Files, function(File)
+                {
+                    File.remove();
+                });
+
+                this.Files.push(NewFile);
+                this.JFiles.append(NewFile.render());
+
+                NewFile.onValue(function()
+                {
+                    self.change();
+                });
+
+                return this;
+            }
+        },
+
+        change: function()
+        {
+            var self = this;
+
+            if (this.isMultiple())
+            {
+
+            } else
+            {
+                self.JElement.val('');
+
+                _.each(this.Files, function(File)
+                {
+                    self.JElement.val(File.getValue());
+                });
+
+                self.JElement.change();
+                this.trigger('change');
+                return this;
+            }
+        },
+
+        /**
+         * @param id
+         * @returns {sx.classes.fileupload.AjaxFileUpload}
+         */
+        removeFile: function(id)
+        {
+            var newFiles = [];
+
+            _.each(this.Files, function(File)
+            {
+                if (File.get('id') != id)
+                {
+                    newFiles.push(File);
+                }
+            });
+
+            this.Files = newFiles;
+            this.change();
             return this;
         }
+
     });
 
 })(sx, sx.$, sx._);

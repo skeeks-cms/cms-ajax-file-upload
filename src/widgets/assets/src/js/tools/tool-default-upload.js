@@ -20,9 +20,48 @@
         {
             var self = this;
 
+            //@see https://github.com/blueimp/jQuery-File-Upload/wiki/Drop-zone-effects
+            $(document).bind('drop dragover', function (e) {
+                e.preventDefault();
+            });
+
+            $(document).bind('dragover', function (e) {
+                var dropZone = $('.dropzone'),
+                    timeout = window.dropZoneTimeout;
+                if (!timeout) {
+                    dropZone.addClass('in');
+                } else {
+                    clearTimeout(timeout);
+                }
+                var found = false,
+                    node = e.target;
+                do {
+                    if (node === dropZone[0]) {
+                        found = true;
+                        break;
+                    }
+                    node = node.parentNode;
+                } while (node != null);
+                if (found) {
+                    dropZone.addClass('hover');
+                } else {
+                    dropZone.removeClass('hover');
+                }
+                window.dropZoneTimeout = setTimeout(function () {
+                    window.dropZoneTimeout = null;
+                    dropZone.removeClass('in hover');
+                }, 100);
+            });
+
             this.JInput = $('#' + this.get('id'));
 
-            jQuery(this.JInput).fileupload(this.get('uploadfile'));
+            jQuery(this.JInput).fileupload(
+                _.extend(this.get('uploadfile'), {
+                    formData: {
+                        'formName' : this.get('id')
+                    }
+                })
+            );
 
             jQuery(this.JInput).on('fileuploadadd', function(e, data) {
 
@@ -31,10 +70,11 @@
                 $.each(data.files, function (index, file) {
 
                     FileObject.set('fileinfo', file);
+                    FileObject.set('name', file.name);
+                    FileObject.set('state', 'queue');
                 });
 
                 data.context = FileObject;
-
                 self.Uploader.addFile(FileObject);
             });
 
@@ -44,20 +84,16 @@
                 var index = data.index,
                 file = data.files[index];
 
+                console.log(file);
                 if (file.preview) {
-                    FileObject.JImgPrev.append(file.preview);
+                    FileObject.set('preview', file.preview);
                 }
 
                 if (file.error) {
-
-                    FileObject.JResult.empty().append(file.error);
+                    FileObject.set('error', file.error);
                 }
-            });
 
-            jQuery(this.JInput).on('fileuploadprogressall', function(e, data) {
-                console.log("fileuploadprogressall");
-                console.log(e);
-                console.log(data);
+                FileObject.render();
             });
 
             jQuery(this.JInput).on('fileuploaddone', function(e, data) {
@@ -66,13 +102,13 @@
 
                 if (data.result.success === true)
                 {
-                    FileObject.JResult.empty().append("ОК");
+                    FileObject.set('error', '');
+                    FileObject.set('state', 'success');
                 } else
                 {
-                    FileObject.JResult.empty().append("<span style='color: red;'>" + data.result.message + "</span>");
+                    FileObject.set('error', data.result.message);
+                    FileObject.set('state', 'fail');
                 }
-
-                FileObject.JWrapper.removeClass('sx-file-process').addClass('sx-file-success');
 
                 $.each(data.result.files, function (index, file) {
                     if (file.url) {
@@ -88,78 +124,72 @@
                             .append(error);
                     }
                 });
-            });
 
-            jQuery(this.JInput).on('fileuploadsubmit', function(e, data) {
-                console.log("fileuploadsubmit");
-                console.log(e);
-                console.log(data);
+                FileObject.render();
             });
 
             jQuery(this.JInput).on('fileuploadsend', function(e, data) {
                 var FileObject = data.context;
-                FileObject.JWrapper.removeClass('sx-file-not-uploaded').addClass('sx-file-process');
-                FileObject.JResult.empty().append("<img src='/img/loaders/default-124.svg' height='20'/>").append(" Загрузка...");
-            });
-
-            jQuery(this.JInput).on('fileuploadprocess', function(e, data) {
-                console.log("fileuploadprocess");
-                console.log(e);
-                console.log(data);
-            });
-
-            jQuery(this.JInput).on('fileuploadstart', function(e, data) {
-                console.log("fileuploadstart");
-                console.log(e);
-                console.log(data);
-            });
-
-            jQuery(this.JInput).on('fileuploadstop', function(e, data) {
-                console.log("fileuploadstop");
-                console.log(e);
-                console.log(data);
+                FileObject.set('state', 'process');
+                FileObject.render();
             });
 
             jQuery(this.JInput).on('fileuploadfail', function(e, data) {
-                var FileObject = data.context;
-                FileObject.JResult.empty().append("Ошибка");
+                /*var FileObject = data.context;
+                FileObject.set('state', 'fail');
+                FileObject.set('error', 'File upload failed');
+                FileObject.render();*/
+            });
 
-                $.each(data.files, function (index) {
-                    var error = $('<span class="text-danger"/>').text('File upload failed.');
-                    $(data.context.children()[index])
-                        .append('<br>')
-                        .append(error);
-                });
+
+            jQuery(this.JInput).on('fileuploadprogressall', function(e, data) {
+                /*console.log("fileuploadprogressall");
+                console.log(e);
+                console.log(data);*/
+            });
+
+            jQuery(this.JInput).on('fileuploadsubmit', function(e, data) {
+                /*console.log("fileuploadsubmit");
+                console.log(e);
+                console.log(data);*/
+            });
+
+            jQuery(this.JInput).on('fileuploadprocess', function(e, data) {
+                /*console.log("fileuploadprocess");
+                console.log(e);
+                console.log(data);*/
+            });
+
+            jQuery(this.JInput).on('fileuploadstart', function(e, data) {
+                /*console.log("fileuploadstart");
+                console.log(e);
+                console.log(data);*/
+            });
+
+            jQuery(this.JInput).on('fileuploadstop', function(e, data) {
+                /*console.log("fileuploadstop");
+                console.log(e);
+                console.log(data);*/
             });
 
             jQuery(this.JInput).on('paste', function(e, data) {
-                console.log("paste");
+                /*console.log("paste");
                 console.log(e);
-                console.log(data);
+                console.log(data);*/
             });
 
             jQuery(this.JInput).on('drop', function(e, data) {
-                console.log("drop");
+                /*console.log("drop");
                 console.log(e);
-                console.log(data);
+                console.log(data);*/
             });
 
             jQuery(this.JInput).on('dragover', function(e, data) {
-                console.log("dragover");
-                e.preventDefault(); // Prevents the default dragover action of the File Upload widget
+                /*console.log("dragover");
+                e.preventDefault();
                 console.log(e);
-                console.log(data);
+                console.log(data);*/
             });
-
-            /*jQuery(this.JInput).on('fileuploaddone', function(e, data) {
-                var result = data.result.data;
-                $("<img>", {
-                    'src' : result.publicPath,
-                    'style' : 'max-width: 80px; max-height: 80px;'
-                }).appendTo(self.jFiles);
-                self.jInputHidden.val(result.rootPath);
-                self.jInputHidden.change();
-            });*/
         },
 
     });

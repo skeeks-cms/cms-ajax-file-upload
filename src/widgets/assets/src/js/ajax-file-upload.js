@@ -67,6 +67,14 @@
         },
 
         /**
+         * @returns {*}
+         */
+        getFileStates: function()
+        {
+            return new sx.classes.Entity( this.get('fileStates') );
+        },
+
+        /**
          * @param File
          * @returns {sx.classes.fileupload.AjaxFileUpload}
          */

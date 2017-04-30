@@ -53,7 +53,7 @@ class UploadController extends Controller
         $rr = new RequestResponse();
         try
         {
-            $imageFile = UploadedFile::getInstanceByName('file');
+            $imageFile = UploadedFile::getInstanceByName(\Yii::$app->request->post('formName'));
             $directory = \Yii::getAlias($this->local_root_tmp_dir) . DIRECTORY_SEPARATOR;
             if (!is_dir($directory))
             {

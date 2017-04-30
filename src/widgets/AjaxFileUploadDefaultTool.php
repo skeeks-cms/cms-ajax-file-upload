@@ -61,11 +61,15 @@ class AjaxFileUploadDefaultTool extends AjaxFileUploadTool
         'uploadfile' =>
         [
             'disableImageResize' => '/Android(?!.*Chrome)|Opera/.test(window.navigator && navigator.userAgent)',
-            'imageCrop' => true,
+            /*'imageCrop' => true,*/
 
-            'previewMaxWidth' => 400,
-            'previewMaxHeight' => 300,
-            'previewCrop' => true,
+            'previewMaxWidth' => 200,
+            'previewMaxHeight' => 200,
+            /*'imageMaxHeight' => 300,
+            'imageMaxWidth' => 300,*/
+            'previewCrop' => false,
+            'previewCanvas' => false,
+            'previewThumbnail' => false,
             'limitMultiFileUploads' => 1,
             'limitConcurrentUploads' => 1,
         ]

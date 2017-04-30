@@ -4,7 +4,7 @@
 /* @var $this yii\web\View */
 $widget = $this->context;
 ?>
-<div class="sx-ajax-file-uploader-wrapper" id="<?= $widget->id; ?>">
+<div class="sx-ajax-file-uploader-wrapper dropzone" id="<?= $widget->id; ?>">
     <div class="row">
 
         <div class="col-sm-12 sx-files" style="float: left; margin-left: 10px;">

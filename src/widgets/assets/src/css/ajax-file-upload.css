@@ -8,7 +8,34 @@
 
 }
 
-.sx-file-not-uploaded
+.dropzone {
+    /*background: palegreen;*/
+}
+    .dropzone.in {
+        font-size: larger;
+        background: silver;
+    }
+    .dropzone.hover {
+        background: lawngreen;
+    }
+    .dropzone.fade {
+        -webkit-transition: all 0.3s ease-out;
+        -moz-transition: all 0.3s ease-out;
+        -ms-transition: all 0.3s ease-out;
+        -o-transition: all 0.3s ease-out;
+        transition: all 0.3s ease-out;
+        opacity: 1;
+    }
+
+
+.sx-state-fail .sx-result
+{
+    color: red;
+}
+
+.sx-state-fail,
+.sx-state-queue
 {
     opacity: 0.5;
 }
+

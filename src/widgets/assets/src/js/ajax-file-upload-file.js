@@ -21,37 +21,121 @@
         {
             var self = this;
 
+            this.isUploaded = false;
+
             if (! (AjaxFileUpload instanceof sx.classes.fileupload.AjaxFileUpload))
             {
                 throw new Error('Upload manager not uploaded');
             }
 
             opts = opts || {};
-            opts['Uploader'] = AjaxFileUpload;
+            this.Uploader = AjaxFileUpload;
 
             this.applyParentMethod(sx.classes.Component, 'construct', [opts]);
         },
 
 
         /**
+         * @private
+         */
+        _onDomReady: function()
+        {
+            var self = this;
+            this.JWrapper = $('<div>', {'class': 'col-md-3'});
+
+
+        },
+
+
+
+
+        /**
+         * Расшифровка состояния
+         * @returns {*}
+         */
+        getStateText: function () {
+
+            var states = this.Uploader.getFileStates();
+            return states.get( this.getState(), 'Не определен' );
+        },
+
+        /**
+         * Код состояния
+         * @returns {string}
+         */
+        getState: function()
+        {
+            return String(this.get('state', 'undefined'));
+        },
+
+        /**
+         * @returns {string}
+         */
+        getName: function()
+        {
+            return String(this.get('name', 'undefined'));
+        },
+
+        /**
+         * @returns {string}
+         */
+        getError: function()
+        {
+            return this.get('error');
+        },
+
+        /**
+         * @returns {string}
+         */
+        getPreview: function()
+        {
+            return this.get('preview');
+        },
+
+        /**
+         * @returns {string}
+         */
+        getValue: function()
+        {
+            return String(this.get('value'));
+        },
+
+        /**
          * @returns {*|HTMLElement}
          */
         render: function()
         {
-            this.JWrapper = $('<div>', {'class': 'col-md-3 sx-file-not-uploaded'});
-            this.JCaption = $('<div>', {'class': 'caption'});
-            this.JThumbWrapper = $('<div>', {'class' : 'thumbnail sx-box-shadow sx-box-shadow-hover-color'});
-            this.JImgPrev = $('<div>', {'class' : 'img-preview'});
-            this.JResult = $('<div>', {'class' : 'sx-result'}).append('В очереди на загрузку...');
+            this.JCaption       = $('<div>', {'class' : 'caption'});
+            this.JThumbWrapper  = $('<div>', {'class' : 'thumbnail'});
+            this.JFilePrev       = $('<div>', {'class' : 'file-preview'});
+            this.JResult        = $('<div>', {'class' : 'sx-result'}).append(this.getStateText());
 
             this.JCaption
-                .append($('<h4>', {'title' : this.get('fileinfo').name}).text(this.get('fileinfo').name))
+                .append($('<h4>', {'title' : this.getName()}).text(this.getName()))
                 .append(this.JResult);
 
+            this.JThumbWrapper.append(this.JFilePrev).append(this.JCaption);
 
-            this.JWrapper.append(this.JThumbWrapper);
-            this.JThumbWrapper.append(this.JImgPrev).append(this.JCaption);
+            if (this.getError())
+            {
+                console.log('error');
+                console.log(this.getError());
+                this.JResult.empty().append(this.getError());
+            }
 
+            if (this.getPreview())
+            {
+                this.JFilePrev.empty().append(this.getPreview());
+            }
+
+            this.JWrapper
+                .removeClass('sx-state-queue')
+                .removeClass('sx-state-process')
+                .removeClass('sx-state-success')
+                .removeClass('sx-state-fail')
+                .addClass('sx-state-' + this.getState());
+
+            this.JWrapper.empty().append(this.JThumbWrapper);
             return this.JWrapper;
         }
     });

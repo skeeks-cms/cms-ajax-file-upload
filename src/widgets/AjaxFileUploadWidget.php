@@ -65,6 +65,13 @@ class AjaxFileUploadWidget extends InputWidget
         $this->options['multiple'] = $this->multiple;
         $this->clientOptions['id'] = $this->id;
 
+        $this->clientOptions['fileStates'] = [
+            'queue' => \Yii::t('skeeks/cms-fileupload', 'Queue'),
+            'process' => \Yii::t('skeeks/cms-fileupload', 'Loading'),
+            'fail' => \Yii::t('skeeks/cms-fileupload', 'Fail'),
+            'success' => \Yii::t('skeeks/cms-fileupload', 'Success'),
+        ];
+
         $tools = [];
 
         foreach ($this->tools as $id => $config)

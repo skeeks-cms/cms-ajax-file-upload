@@ -44,14 +44,26 @@
                 var ajax = sx.ajax.preparePostQuery(self.get('upload_url'), {
                     'link': link
                 });
+                var Handler = new sx.classes.AjaxHandlerStandartRespose(ajax, {
+                    'allowResponseErrorMessage' : false,
+                    'allowResponseSuccessMessage' : false,
+                });
 
-                ajax.onComplete(function (e, data)
+                Handler.bind('success', function(e, data)
                 {
                     FileObject.set('state', 'success');
-                    /*self.triggerCompleteUploadFile({
-                        'response': data.jqXHR.responseJSON
-                    });*/
+                    FileObject.merge(data.data);
+                    FileObject.setValue(data.data.rootPath);
+                    FileObject.render();
                 });
+
+                Handler.bind('error', function(e, data)
+                {
+                    FileObject.set('state', 'fail');
+                    FileObject.set('error', data.message);
+                    FileObject.render();
+                });
+
 
                 ajax.execute();
             });

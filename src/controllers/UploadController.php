@@ -11,7 +11,10 @@ namespace skeeks\cms\fileupload\controllers;
 use common\models\User;
 use skeeks\cms\actions\LogoutAction;
 use skeeks\cms\helpers\RequestResponse;
+use skeeks\cms\helpers\StringHelper;
 use skeeks\cms\vkDatabase\models\VkCity;
+use skeeks\imagine\Image;
+use skeeks\sx\File;
 use Yii;
 use skeeks\module\cms\user\model\LoginForm;
 use skeeks\module\cms\user\model\PasswordResetRequestForm;
@@ -25,6 +28,7 @@ use yii\helpers\ArrayHelper;
 use yii\helpers\FileHelper;
 use yii\helpers\Json;
 use yii\httpclient\Client;
+use yii\validators\UrlValidator;
 use yii\web\BadRequestHttpException;
 use yii\web\Controller;
 use yii\filters\VerbFilter;
@@ -67,26 +71,145 @@ class UploadController extends Controller
                 throw new Exception(\Yii::t('app', 'Could not create a directory for download'));
             }
 
-            if ($file)
+            if ($file && \Yii::$app->request->post('formName'))
             {
-                $filePath = $directory . $file->name;
-                if (!$file->saveAs($filePath))
+                $rootPath = $directory . $file->name;
+                if (!$file->saveAs($rootPath))
                 {
                     throw new Exception(\Yii::t('app', 'Could not upload the image to a local folder'));
                 }
-                $path = $this->local_public_tmp_dir . '/' . $uid . "/" . $file->name;
+
+                $src = $this->local_public_tmp_dir . '/' . $uid . "/" . $file->name;
                 $rr->success = true;
-                $rr->data = [
+                $data = [
                     'name'          =>  $file->name,
-                    'size'          =>  $file->size,
-                    "src"           =>  $path,
-                    "rootPath"      =>  $filePath,
+                    "src"           =>  $src,
+                    "rootPath"      =>  $rootPath,
+                ];
+
+            } else if ($link = \Yii::$app->request->post('link'))
+            {
+                $errors = '';
+                if (!(new UrlValidator())->validate($link, $errors))
+                {
+                    throw new Exception($errors);
+                }
+
+                $client = new Client();
+                $response = $client->createRequest()
+                    ->setMethod('get')
+                    ->setUrl($link)
+                    ->send();
+
+                if (!$response->isOk) {
+                    throw new Exception( \Yii::t('skeeks/cms-fileupload', 'File not available for download') );
+                }
+
+                $clearLink = $link;
+                if ($pos = strpos($link, "?"))
+                {
+                    $link = StringHelper::substr($link, 0, $pos);
+                }
+
+                $file_content = $response->content;
+
+                if (!extension_loaded('fileinfo'))
+                {
+                    throw new Exception( \Yii::t('skeeks/cms-fileupload', 'PHP fileinfo is not installed') );
+                }
+
+                $extension  = pathinfo($link, PATHINFO_EXTENSION);
+                $fileName   = pathinfo($link, PATHINFO_BASENAME);
+
+                if (!$fileName)
+                {
+                    throw new Exception( \Yii::t('skeeks/cms-fileupload', 'Could not determine file name') );
+                }
+
+                $rootPath = $directory . $fileName;
+                $is_file_saved = file_put_contents($rootPath, $file_content);
+
+                if (!$is_file_saved)
+                {
+                    throw new Exception( \Yii::t('skeeks/cms-fileupload', 'Could not save file') );
+                }
+
+                try
+                {
+                    $mimeType = FileHelper::getMimeType($rootPath, null, false);
+                } catch (InvalidConfigException $e)
+                {
+                    throw new Exception( \Yii::t('skeeks/cms-fileupload', 'Could not determine file extension:') . " " . $e->getMessage());
+                }
+
+                if (!$mimeType)
+                {
+                    throw new Exception( \Yii::t('skeeks/cms-fileupload', 'Could not determine file mimeType') );
+                }
+
+
+                if (!$extension)
+                {
+                    $extensions = FileHelper::getExtensionsByMimeType($mimeType);
+                    if ($extensions)
+                    {
+                        if (in_array("jpg", $extensions))
+                        {
+                            $extension = 'jpg';
+                        } else if (in_array("png", $extensions))
+                        {
+                            $extension = 'png';
+                        } else
+                        {
+                            $extension = $extensions[0];
+                        }
+
+                        $fileName = $fileName . "." . $extension;
+
+
+                        $rootPath = $directory . $fileName;
+                        $is_file_saved = file_put_contents($rootPath, $file_content);
+
+                        if (!$is_file_saved)
+                        {
+                            throw new Exception( \Yii::t('skeeks/cms-fileupload', 'Could not save file') );
+                        }
+                    }
+                }
+
+
+                $src = $this->local_public_tmp_dir . '/' . $uid . "/" . $fileName;
+                $rr->success = true;
+
+                $data = [
+                    'name'          =>  $fileName,
+                    "src"           =>  $src,
+                    "rootPath"      =>  $rootPath,
                 ];
             }
 
+            $size = filesize($rootPath);
+            $mimeType = FileHelper::getMimeType($rootPath);
+
+            $data['type'] = $mimeType;
+            $type = $mimeType ? explode("/", $mimeType)[0] : "";
+            $data['size'] = $size;
+            $data['sizeFormated'] = \Yii::$app->formatter->asShortSize($size);
+
+            if ($type == 'image')
+            {
+                $image = Image::getImagine()->open($rootPath);
+                $data['image'] = [
+                    'height' => $image->getSize()->getHeight(),
+                    'width' => $image->getSize()->getWidth(),
+                ];
+            }
+
+            $rr->data = $data;
+
         } catch (\Exception $e)
         {
-            \Yii::error($e->getMessage(), 'uploader');
+            \Yii::error($e->getMessage(), static::class);
             $rr->message = $e->getMessage();
             $rr->success = false;
         }

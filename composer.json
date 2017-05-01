@@ -18,7 +18,8 @@
 	],
 	"require": {
 		"skeeks/cms": "*",
-		"2amigos/yii2-file-upload-widget": "*"
+		"2amigos/yii2-file-upload-widget": "*",
+		"yiisoft/yii2-httpclient": "*"
 	},
     "autoload": {
         "psr-4": {

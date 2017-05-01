@@ -38,6 +38,7 @@ class AjaxFileUploadRemoteTool extends AjaxFileUploadTool
 
         $this->id = $this->ajaxFileUploadWidget->id . "-" . $this->id;
         $this->clientOptions['id'] = $this->id;
+        $this->clientOptions['upload_url'] = $this->upload_url;
     }
 
     public function run()

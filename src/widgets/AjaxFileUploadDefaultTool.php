@@ -65,8 +65,8 @@ class AjaxFileUploadDefaultTool extends AjaxFileUploadTool
             'disableImageResize' => '/Android(?!.*Chrome)|Opera/.test(window.navigator && navigator.userAgent)',
             /*'imageCrop' => true,*/
 
-            'previewMaxWidth' => 200,
-            'previewMaxHeight' => 200,
+            'previewMaxWidth' => 150,
+            'previewMaxHeight' => 150,
             /*'imageMaxHeight' => 300,
             'imageMaxWidth' => 300,*/
             'previewCrop' => false,
@@ -86,6 +86,7 @@ class AjaxFileUploadDefaultTool extends AjaxFileUploadTool
         $this->options['id'] = $this->id;
         $this->options['data-url'] = $this->upload_url;
         $this->options['multiple'] = $this->ajaxFileUploadWidget->multiple;
+        $this->options['accept'] = $this->ajaxFileUploadWidget->accept;
 
         $this->clientOptions = ArrayHelper::merge($this->defaultClientOptions, $this->clientOptions);
         $this->clientOptions['id'] = $this->id;

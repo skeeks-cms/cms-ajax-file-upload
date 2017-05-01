@@ -18,6 +18,7 @@ use yii\base\Widget;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\helpers\Json;
+use yii\helpers\Url;
 use yii\widgets\InputWidget;
 
 /**
@@ -36,6 +37,8 @@ class AjaxFileUploadWidget extends InputWidget
     public $upload_url      = ['/fileupload/upload'];
 
     public $multiple        = false;
+
+    public $accept          = ''; //'image/*';
 
     /**
      * @var AjaxFileUploadDefaultTool[]
@@ -68,6 +71,8 @@ class AjaxFileUploadWidget extends InputWidget
 
         FileUploadModule::registerTranslations();
 
+        $this->upload_url = Url::to($this->upload_url);
+
         $this->options['multiple'] = $this->multiple;
         $this->clientOptions['multiple'] = $this->multiple;
         $this->clientOptions['id'] = $this->id;
@@ -89,10 +94,17 @@ class AjaxFileUploadWidget extends InputWidget
                         'name' => $file->fileName,
                         'value' => $file->id,
                         'state' => 'success',
+                        'size' => $file->size,
+                        'type' => $file->mime_type,
+                        'src' => $file->src,
                     ];
 
                     if ($file->isImage())
                     {
+                        $fileData['image'] = [
+                            'height' => $file->image_height,
+                            'width' => $file->image_width,
+                        ];
                         $fileData['preview'] = Html::img($file->src);
                     }
 
@@ -110,9 +122,17 @@ class AjaxFileUploadWidget extends InputWidget
                     'name' => $this->cmsFile->fileName,
                     'value' => $this->cmsFile->id,
                     'state' => 'success',
+                    'size' => $this->cmsFile->size,
+                    'type' => $this->cmsFile->mime_type,
+                    'src' => $this->cmsFile->src,
                 ];
                 if ($this->cmsFile->isImage())
                 {
+                    $fileData['image'] = [
+                        'height' => $this->cmsFile->image_height,
+                        'width' => $this->cmsFile->image_width,
+                    ];
+
                     $fileData['preview'] = Html::img($this->cmsFile->src);
                 }
                 $this->clientOptions['files'][] = $fileData;

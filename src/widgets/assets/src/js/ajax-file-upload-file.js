@@ -163,9 +163,8 @@
                 this.JControllsRemove
             );
 
-
             this.JCaption
-                .append($('<h4>', {'title' : this.getName()}).text(this.getName()))
+                .append($('<div>', {'title' : this.getName(), 'class': 'sx-title'}).text(this.getName()))
                 .append(this.JResult);
 
             this.JThumbWrapper.append(this.JFilePrev).append(this.JCaption);
@@ -182,10 +181,18 @@
 
             if (this.getState() == 'process' || this.getState() == 'queue')
             {
-                this.JResult.append(this.getStateText())
+                this.JResult.empty().append(this.getStateText());
                 /*this.Blocker.block();*/
-            } else
+            } else if (this.getState() == 'success')
             {
+                if (this.getType() == 'image')
+                {
+                    self.JFilePrev.empty().append(
+                        $('<img>', {'src' : self.get('src')})
+                    );
+                };
+
+                this.JResult.empty().append(this.getResultString());
                 /*this.Blocker.unblock();*/
             }
 
@@ -206,6 +213,48 @@
 
 
             return this.JWrapper;
+        },
+
+        /**
+         * @returns {*}
+         */
+        getSizeFormated: function()
+        {
+            if (this.get('sizeFormated'))
+            {
+                return this.get('sizeFormated');
+            } else
+            {
+                return this.get('size') + " КиБ;";
+            }
+        },
+
+        getType: function()
+        {
+            if (this.get('type'))
+            {
+                var type = this.get('type').split("/");
+                return type[0];
+            }
+
+            return '';
+        },
+
+        /**
+         * @returns {string}
+         */
+        getResultString: function()
+        {
+            var result = '';
+            result = 'Размер: ' + this.getSizeFormated();
+
+            if (this.get('image'))
+            {
+                var image = this.get('image');
+                result = result + " " + image.height + 'x' + image.width + ';';
+            }
+
+            return result;
         },
 
         /**

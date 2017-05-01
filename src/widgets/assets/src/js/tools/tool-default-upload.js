@@ -84,7 +84,6 @@
                 var index = data.index,
                 file = data.files[index];
 
-                console.log(file);
                 if (file.preview) {
                     FileObject.set('preview', file.preview);
                 }
@@ -97,7 +96,6 @@
             });
 
             jQuery(this.JInput).on('fileuploaddone', function(e, data) {
-                console.log(data.result);
                 var FileObject = data.context;
 
                 if (data.result.success === true)
@@ -105,7 +103,7 @@
                     FileObject.set('error', '');
                     FileObject.set('state', 'success');
 
-                    FileObject.set('src', data.result.data.publicPath);
+                    FileObject.merge(data.result.data)
                     FileObject.setValue(data.result.data.rootPath);
                 } else
                 {
